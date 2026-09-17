@@ -18,19 +18,19 @@ A café business acquired a coffee supplier company that ran its **inventory tra
 
 ```
 BEFORE                              AFTER
-┌─────────────────┐                ┌─────────────────────────────┐
-│  AppServerNode   │                │   Docker Host (EC2)          │
-│  (Node.js on OS) │                │   ┌───────────┐               │
-└─────────────────┘                │   │ node_app  │──┐            │
-┌─────────────────┐    ──────►     │   │ container │  │  network   │
-│ MysqlServerNode   │                │   └───────────┘  │            │
-│ (MySQL on OS)     │                │   ┌───────────┐  │            │
-└─────────────────┘                │   │ mysql_1    │◄─┘            │
-                                    │   │ container │               │
-                                    │   └───────────┘               │
-                                    └─────────────────────────────┘
-                                              │
-                                              ▼
+┌─────────────────┐                ┌────────────────────────────────┐
+│  AppServerNode  │                │   Docker Host (EC2)            │
+│ (Node.js on OS) │                │   ┌───────────┐                │
+└─────────────────┘                │   │ node_app  │──┐             │
+┌─────────────────┐    ──────►     │   │ container │  │  network    │
+│ MysqlServerNode │                │   └───────────┘  │             │
+│ (MySQL on OS)   │                │   ┌───────────┐  │             │
+└─────────────────┘                │   │ mysql_1   │◄─┘             │
+                                   │   │ container │                │
+                                   │   └───────────┘                │
+                                   └────────────────────────────────┘
+                                                   │
+                                                   ▼
                                     📦 Amazon ECR (node-app:latest)
 ```
 
@@ -69,12 +69,9 @@ Provisioned the VS Code IDE, downloaded the lab codebase, and ran the setup scri
 ### Task 2 — Baseline Application Analysis
 Verified the original app running directly on the `AppServerNode` EC2 instance's guest OS (Node.js on port 80), added and edited a supplier record to confirm CRUD functionality end-to-end.
 
-<p align="center">
-  <img src="screenshots/01-original-app-home.png" width="600" alt="Original coffee suppliers app home page"/>
-</p>
-<p align="center">
-  <img src="screenshots/02-original-app-supplier-added.png" width="600" alt="Supplier record added on original EC2-hosted app"/>
-</p>
+<img width="1918" height="868" alt="01-original-app-home" src="https://github.com/user-attachments/assets/a0059377-eacd-410d-8de5-b1ee94b46d78" />
+
+<img width="1917" height="872" alt="02-original-app-supplier-added" src="https://github.com/user-attachments/assets/8e1305bb-17fe-4eec-91e1-1a326883a369" />
 
 ### Task 3 — Containerizing the Node.js Application
 
@@ -166,30 +163,33 @@ aws ecr list-images --repository-name node-app
 | 4 | `docker build` → `ERROR: failed to solve: the Dockerfile cannot be empty` | Pasted Dockerfile content into the **wrong file** (a stray `Dockerfile` was auto-created one directory level up) | Wrote the Dockerfile directly from the terminal with a heredoc (`cat > Dockerfile << 'EOF' ... EOF`) inside the correct `mysql/` directory |
 | 5 | `git push` → `GH007: Your push would publish a private email address` | Local Git `user.email` was set to a real address not authorized for public pushes under GitHub's privacy protection | Set `git config --global user.email` to the GitHub-provided `@users.noreply.github.com` address and amended the commit |
 
-<p align="center">
-  <img src="screenshots/04-bug-port3000-connection-timeout.png" width="480" alt="Connection timed out before security group fix"/>
-  &nbsp;&nbsp;
-  <img src="screenshots/06-bug-db-connection-error.png" width="480" alt="Database connection error before env var fix"/>
-</p>
+<img width="713" height="652" alt="04-bug-port3000-connection-timeout" src="https://github.com/user-attachments/assets/7ac836f2-c8f4-45f7-85cf-a2931d3bd991" />
+
+<img width="1918" height="863" alt="06-bug-db-connection-error" src="https://github.com/user-attachments/assets/04d3190a-f9f8-4aa1-8097-649695e8f78d" />
 
 ---
 
 ## ✅ Verification Screenshots
 
 **Security group opened for port 3000:**
-<p align="center"><img src="screenshots/03-security-group-before-fix.png" width="700"/></p>
+
+<img width="1918" height="861" alt="03-security-group-before-fix" src="https://github.com/user-attachments/assets/610829a1-77bb-45f5-8fd6-f1174489b7af" />
 
 **Containerized app reachable on port 3000:**
-<p align="center"><img src="screenshots/05-containerized-app-home-working.png" width="700"/></p>
+
+<img width="1918" height="966" alt="05-containerized-app-home-working" src="https://github.com/user-attachments/assets/f06b0a18-305d-43fe-af03-69172abd1528" />
 
 **Node container successfully querying the original EC2 MySQL instance:**
-<p align="center"><img src="screenshots/07-container-connected-to-ec2-mysql.png" width="700"/></p>
+
+<img width="1918" height="982" alt="07-container-connected-to-ec2-mysql" src="https://github.com/user-attachments/assets/97e8f455-82bf-4690-8609-3b038cab5cf1" />
 
 **Final proof: Node container ↔ MySQL container (data shows "Container Street"):**
-<p align="center"><img src="screenshots/08-final-container-to-container-success.png" width="700"/></p>
+
+<img width="1918" height="870" alt="08-final-container-to-container-success" src="https://github.com/user-attachments/assets/1e591ced-5c67-4484-ae27-504ccde7d737" />
 
 **All EC2 instances healthy and running:**
-<p align="center"><img src="screenshots/09-ec2-instances-running.png" width="700"/></p>
+
+<img width="1918" height="815" alt="09-ec2-instances-running" src="https://github.com/user-attachments/assets/be3ccf21-c1d0-400e-af21-bcfc7a432d1e" />
 
 ---
 
